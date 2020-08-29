@@ -6,6 +6,7 @@ using AutoMapper;
 using BookStore_API.Contracts;
 using BookStore_API.Data;
 using BookStore_API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,6 +39,7 @@ namespace BookStore_API.Controllers
         /// </summary>
         /// <returns>List Of Authors</returns>
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAuthors()
         {
             try
@@ -65,6 +67,7 @@ namespace BookStore_API.Controllers
         /// </summary>
         /// <returns>Author</returns>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAuthor(int id)
         {
             try
@@ -95,6 +98,7 @@ namespace BookStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Create([FromBody] AuthorCreateDTO authorDTO)
         {
             try
@@ -133,6 +137,7 @@ namespace BookStore_API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = "Admin,Customer")]
         public async Task<IActionResult> Update(int id, [FromBody] AuthorUpdateDTO authorDTO)
         {
             try
