@@ -40,6 +40,7 @@ namespace BookStore_UI
             services.AddScoped<ApiAuthenticationStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(e => e.GetRequiredService<ApiAuthenticationStateProvider>());
             services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
+            services.AddScoped<IAuthorRepository, AuthorRepository>();
             services.AddSingleton<WeatherForecastService>();
         }
 

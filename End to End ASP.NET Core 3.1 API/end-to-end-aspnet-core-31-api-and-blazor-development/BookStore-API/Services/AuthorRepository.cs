@@ -24,20 +24,20 @@ namespace BookStore_API.Services
         public async Task<bool> Delete(Author entity)
         {
 
-             _context.Authors.Remove(entity);
+            _context.Authors.Remove(entity);
             return await Save();
         }
 
         public async Task<IList<Author>> FindAll()
         {
-            var authors = await _context.Authors.ToListAsync();
+            var authors = await _context.Authors.Include(e => e.Books).ToListAsync();
             return authors;
         }
 
         public async Task<Author> FindById(int id)
         {
 
-            var author = await _context.Authors.FindAsync(id);
+            var author = await _context.Authors.Include(e => e.Books).FirstOrDefaultAsync(e => e.Id == id);
             return author;
         }
 
@@ -49,13 +49,13 @@ namespace BookStore_API.Services
         public async Task<bool> Save()
         {
             var changes = await _context.SaveChangesAsync();
-            return changes> 0;
+            return changes > 0;
         }
 
         public async Task<bool> Update(Author entity)
         {
 
-             _context.Authors.Update(entity);
+            _context.Authors.Update(entity);
             return await Save();
         }
     }
