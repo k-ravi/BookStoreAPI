@@ -1,4 +1,4 @@
-﻿@page "/authors/create/"
+﻿@page "/authors/create1"
 
 @inject IAuthorRepository _authRepo
 @inject NavigationManager _navManager
@@ -42,7 +42,7 @@
 @code {
     Author Model = new Author();
     bool isFailed = false;
-
+    
     void BackToList()
     {
         _navManager.NavigateTo("/authors/");

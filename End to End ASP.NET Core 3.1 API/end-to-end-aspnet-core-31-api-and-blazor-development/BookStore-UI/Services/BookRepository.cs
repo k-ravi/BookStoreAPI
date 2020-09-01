@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace BookStore_UI.Services
 {
-    public class AuthorRepository : BaseRepository<Author>, IAuthorRepository
+    public class BookRepository : BaseRepository<Book>, IBookRepository
     {
-        readonly IHttpClientFactory _httprClient;
         readonly ILocalStorageService _localStorage;
-        public AuthorRepository(IHttpClientFactory httpClient, ILocalStorageService localStorage) :base(httpClient, localStorage)
+        readonly IHttpClientFactory _httpClient;
+        public BookRepository(ILocalStorageService localStorage, IHttpClientFactory httpClient) : base(httpClient, localStorage)
         {
-            _httprClient = httpClient;
             _localStorage = localStorage;
+            _httpClient = httpClient;
         }
     }
 }

@@ -1,0 +1,126 @@
+﻿@page "/books/create"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IBookRepository _bookRepo
+@inject IFileUpload _fileUpload
+@inject IAuthorRepository _authRepo
+@inject NavigationManager navManage
+<h3 class="card-title">Create</h3>
+<hr />
+<br />
+@if (!isSuccess)
+{
+    <ErrorMessage Message="Something went wrong while creating book"></ErrorMessage>
+}
+<EditForm Model="Model" OnValidSubmit="CreateBook">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <div class="form-group">
+        <label for="title">Book Title</label>
+        <InputText @bind-Value="Model.Title" class="form-control" id="title"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="isbn">ISBN</label>
+        <InputText @bind-Value="Model.ISBN" class="form-control" id="isbn"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="price">Price</label>
+        <InputNumber @bind-Value="Model.Price" class="form-control" id="price"></InputNumber>
+    </div>
+    <div class="form-group">
+        <label for="isbn">Authors</label>
+        <select @bind="Model.AuthorId" class="form-control" id="author">
+            <option value="">--Select--</option>
+            @if (authors != null)
+            {
+                foreach (var author in authors)
+                {
+                    <option value="@author.Id">@author.FirstName @author.LastName</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="summery">Summery</label>
+        <InputTextArea @bind-Value="Model.Summary" class="form-control" id="summery"></InputTextArea>
+    </div>
+    <div class="form-group">
+        <label for="bookcover">Book Cover Photo</label>
+        <InputFile OnChange="HandleFileSection" />
+
+        @if (isInvalidaType)
+        {
+            <ErrorMessage Message="Select the valid file or leave blank"></ErrorMessage>
+        }
+        @if (!string.IsNullOrWhiteSpace(imageURL))
+        {
+            <img src="@imageURL" style="height:100px;width:100px" />
+        }
+    </div>
+    <button class="btn btn-primary" type="submit">
+        <span class="oi oi-pencil"></span>
+        Create Book
+    </button>
+    <button class="btn btn-outline-secondary" @onclick="BackToList">
+        <span class="oi oi-media-skip-backward">
+        </span>
+        Back To List
+    </button>
+</EditForm>
+
+@code {
+    Book Model = new Book();
+    IList<Author> authors;
+    IFileListEntry file;
+    bool isSuccess = true;
+    string imageURL;
+    bool isInvalidaType = false;
+    System.IO.MemoryStream ms;
+    protected override async Task OnInitializedAsync()
+    {
+        authors = await _authRepo.Get(EndPoints.AuthorsEndPoint);
+    }
+    void BackToList()
+    {
+        navManage.NavigateTo("/books/");
+    }
+    async Task HandleFileSection(IFileListEntry[] files)
+    {
+        file = files.FirstOrDefault();
+        if (file != null)
+        {
+            var name = file.Name;
+            if (name.Contains("jpg") || name.Contains("png") || name.Contains("jpeg"))
+            {
+                ms = new System.IO.MemoryStream();
+                await file.Data.CopyToAsync(ms);
+                var reader = new System.IO.StreamReader(file.Data);
+                var image64Data = Convert.ToBase64String(ms.ToArray());
+                imageURL = string.Format("data:image/png;base64,{0}", image64Data);
+                isInvalidaType = false;
+            }
+            else
+            {
+                isInvalidaType = true;
+                imageURL = string.Empty;
+            }
+        }
+        else
+        {
+            isInvalidaType = true;
+        }
+    }
+    async Task CreateBook()
+    {
+        if (!isInvalidaType)
+        {
+            var ext = System.IO.Path.GetExtension(file.Name);
+            var picId = Guid.NewGuid().ToString().Replace("-", "");
+            string image = $"{picId}-{ext}";
+            _fileUpload.UploadFile(file, ms, image);
+            Model.Image = image;
+            isSuccess = await _bookRepo.Create(EndPoints.BooksEndPoint, Model);
+            BackToList();
+        }
+    }
+}
