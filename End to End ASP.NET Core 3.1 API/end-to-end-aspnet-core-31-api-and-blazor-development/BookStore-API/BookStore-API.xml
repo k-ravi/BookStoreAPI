@@ -41,7 +41,6 @@
             Update an author
             </summary>
             <param name="id"></param>
-            <param name="authorDTO"></param>
             <returns></returns>
         </member>
         <member name="T:BookStore_API.Controllers.BooksController">

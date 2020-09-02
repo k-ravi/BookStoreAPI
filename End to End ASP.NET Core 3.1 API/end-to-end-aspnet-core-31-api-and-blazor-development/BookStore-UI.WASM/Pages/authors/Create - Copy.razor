@@ -1,0 +1,63 @@
+﻿@page "/authors/create1"
+
+@inject IAuthorRepository _authRepo
+@inject NavigationManager _navManager
+@inject IToastService _toastService
+<h3 class="card-title">Create Author</h3>
+<br />
+<hr />
+<br />
+@if (isFailed)
+{
+    <ErrorMessage Message="Something went wrong while creating author"></ErrorMessage>
+}
+
+<EditForm Model="Model" OnValidSubmit="CreateAuthor">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <div class="form-group">
+        <label for="firstname">First Name</label>
+        <InputText @bind-Value="@Model.FirstName" class="form-control" id="firstname"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="lastname">Last Name</label>
+        <InputText @bind-Value="@Model.LastName" class="form-control" id="lastname"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="bio">Biography</label>
+        <InputText @bind-Value="@Model.Bio" class="form-control" id="bio"></InputText>
+    </div>
+    <button type="submit" class="btn btn-primary">
+        <span class="oi oi-pencil"></span>
+        Submit Changes
+    </button>
+    <button @onclick="BackToList" class="btn btn-outline-secondary">
+        <span class="oi oi-media-skip-backward"></span>
+        Back to List
+    </button>
+</EditForm>
+
+
+
+@code {
+    Author Model = new Author();
+    bool isFailed = false;
+    
+    void BackToList()
+    {
+        _navManager.NavigateTo("/authors/");
+    }
+    async Task CreateAuthor()
+    {
+        bool isSuccess = await _authRepo.Create(EndPoints.AuthorsEndPoint, Model);
+        if (isSuccess)
+        {
+            _toastService.ShowSuccess("Author Created Successfully");
+            BackToList();
+        }
+        else
+        {
+            isFailed = true;
+        }
+    }
+}

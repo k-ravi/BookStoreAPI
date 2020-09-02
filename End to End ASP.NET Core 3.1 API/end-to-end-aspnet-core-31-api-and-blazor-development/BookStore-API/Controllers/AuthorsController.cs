@@ -173,7 +173,6 @@ namespace BookStore_API.Controllers
         /// Update an author
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="authorDTO"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
